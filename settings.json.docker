@@ -74,7 +74,7 @@
   /*
    * Name your instance!
    */
-  "title": "${TITLE:Etherpad}",
+  "title": "${TITLE: klickipad.de - Etherpad}",
 
   /*
    * favicon default name
