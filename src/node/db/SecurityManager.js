@@ -36,6 +36,9 @@ var authLogger = log4js.getLogger("auth");
  */
 exports.checkAccess = async function(padID, sessionCookie, token, password)
 {
+
+  authLogger.warn("function checkAccess");
+
   // immutable object
   let deny = Object.freeze({ accessStatus: "deny" });
 
@@ -108,14 +111,14 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
       for (let sessionInfo of sessionInfos) {
         // is it for this group?
         if (sessionInfo.groupID != groupID) {
-          authLogger.debug("Auth failed: wrong group");
+          authLogger.warn("Auth failed: wrong group");
           continue;
         }
 
         // is validUntil still ok?
         let now = Math.floor(Date.now() / 1000);
         if (sessionInfo.validUntil <= now) {
-          authLogger.debug("Auth failed: validUntil");
+          authLogger.warn("Auth failed: validUntil");
           continue;
         }
 
@@ -127,7 +130,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
     } catch (err) {
       // skip session if it doesn't exist
       if (err.message == "sessionID does not exist") {
-        authLogger.debug("Auth failed: unknown session");
+        authLogger.warn("Auth failed: unknown session");
       } else {
         throw err;
       }
@@ -137,6 +140,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   let padExists = await p_padExists;
 
   if (padExists) {
+    authLogger.warn("padExists");
     let pad = await padManager.getPad(padID);
 
     // is it a public pad?
@@ -153,6 +157,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
 
   // - a valid session for this group is avaible AND pad exists
   if (validSession && padExists) {
+    authLogger.warn("validSession && padExists");
     let authorID = sessionAuthor;
     let grant = Object.freeze({ accessStatus: "grant", authorID });
 
@@ -195,6 +200,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   }
 
   if (validSession && !padExists) {
+    authLogger.warn("validSession && !padExists");
     // - a valid session for this group avaible but pad doesn't exist
 
     // --> grant access by default
@@ -203,7 +209,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
 
     // --> deny access if user isn't allowed to create the pad
     if (settings.editOnly) {
-      authLogger.debug("Auth failed: valid session & pad does not exist");
+      authLogger.warn("Auth failed: valid session & pad does not exist");
       accessStatus = "deny";
     }
 
@@ -211,6 +217,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   }
 
   if (!validSession && padExists) {
+    authLogger.warn("!validSession && padExists");
     // there is no valid session avaiable AND pad exists
 
     let authorID = await p_tokenAuthor;
@@ -247,7 +254,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
     if (!isPublic) {
       // - it's not public
 
-      authLogger.debug("Auth failed: invalid session & pad is not public");
+      authLogger.warn("Auth failed: invalid session & pad is not public");
       // --> deny access
       return { accessStatus: "deny" };
     }
@@ -256,6 +263,6 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   }
 
   // there is no valid session avaiable AND pad doesn't exist
-  authLogger.debug("Auth failed: invalid session & pad does not exist");
+  authLogger.warn("Auth failed: invalid session & pad does not exist");
   return { accessStatus: "deny" };
 }
