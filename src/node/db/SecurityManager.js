@@ -96,10 +96,14 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   let isPasswordProtected;
   let passwordStatus = password == null ? "notGiven" : "wrong"; // notGiven, correct, wrong
 
+  authLogger.warn("sessionCookie: "  + sessionCookie);
+
   // get information about all sessions contained in this cookie
   if (sessionCookie) {
     let groupID = padID.split("$")[0];
     let sessionIDs = sessionCookie.split(',');
+    authLogger.warn("goupID: "  + groupIDs);
+    authLogger.warn("sessionID: "  + sessionIDs);
 
     // was previously iterated in parallel using async.forEach
     try {
@@ -123,6 +127,7 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
         }
 
         // fall-through - there is a valid session
+        authLogger.warn("Nah man I wont set validSession to true - sorry");
         validSession = true;
         sessionAuthor = sessionInfo.authorID;
         break;
