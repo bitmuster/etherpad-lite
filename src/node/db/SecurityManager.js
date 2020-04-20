@@ -102,8 +102,8 @@ exports.checkAccess = async function(padID, sessionCookie, token, password)
   if (sessionCookie) {
     let groupID = padID.split("$")[0];
     let sessionIDs = sessionCookie.split(',');
-    authLogger.warn("goupID: "  + groupIDs);
-    authLogger.warn("sessionID: "  + sessionIDs);
+    authLogger.warn("goupID: "  + groupID);
+    authLogger.warn("sessionIDs: "  + sessionIDs);
 
     // was previously iterated in parallel using async.forEach
     try {
